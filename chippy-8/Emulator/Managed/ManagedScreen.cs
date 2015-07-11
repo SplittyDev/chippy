@@ -7,10 +7,15 @@ namespace chippy8
 		public const byte WIDTH = 64;
 		public const byte HEIGHT = 32;
 
-		byte[] vmem;
-		protected bool draw;
+		internal byte[] vmem;
+		internal bool draw;
 
 		public virtual string Identifier { get; } = "Virtual screen";
+
+		public byte this [ushort i] {
+			get { return vmem [i]; }
+			set { vmem [i] = value; }
+		}
 
 		public virtual void PreInit () {
 			vmem = new byte[WIDTH * HEIGHT];

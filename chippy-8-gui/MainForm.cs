@@ -32,7 +32,7 @@ namespace chippy8gui
 				.Connect<ManagedMemory> ()
 				.Connect<ManagedCPU> ()
 				.Connect<WinFormsDisplay> ();
-			this.Controls.Add ((emulator.Screen as WinFormsDisplay).pnl);
+			this.Controls.Add ((emulator.Screen as WinFormsDisplay));
 		}
 
 		void InitializeComponents () {

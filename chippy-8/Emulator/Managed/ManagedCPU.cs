@@ -41,7 +41,7 @@ namespace chippy8
 			nibble = (byte)((op & 0xF000) >> 12);
 			PC += 2;
 
-			Console.WriteLine ("Opcode: {0}", op.ToString ("X4"));
+			//Console.WriteLine ("Opcode: {0}", op.ToString ("X4"));
 
 			switch (nibble) {
 			// 0x0NNN
@@ -223,20 +223,26 @@ namespace chippy8
 				x = (ushort)((op & 0x0F00) >> 8);
 				y = (ushort)((op & 0x00F0) >> 4);
 				n = (byte)(op & 0x000F);
-				V [0xF] = 0;
-				for (int yline = 0; yline < 32; yline++)
-				{
-					var pixel = mem [(ushort)(I + yline)];
-					for(int xline = 0; xline < 8; xline++)
-					{
-						if((pixel & (0x80 >> xline)) != 0)
-						{
-							if (screen.CheckPixel ((ushort)(x + xline + ((y + yline) * 64))))
-								V[0xF] = 1;
-							screen.SetPixel ((ushort)(x + xline + ((y + yline) * 64)));
-						}
+
+				V[0xF] = 0;
+				byte px, py = 0;
+				for (int yy = 0; yy < n; yy++) {
+					py = (byte)((V[y] + yy) % 32);
+					if (py < 0 || py > 32)
+						continue;
+					for (int xx = 0; xx < 8; xx++) {
+						px = (byte)((V[x] + xx) % 64);
+						if (px < 0 || px > 64)
+							continue;
+						byte color = (byte)((mem [(ushort)(I + yy)] >> (7 - xx)) & 1);
+						byte col = screen [(ushort)(px + py * 64)];
+						if (color > 0 && col > 0)
+							V[0xF] = 1;
+						color ^= col;
+						screen[(ushort)(px + py * 64)] = color;
 					}
 				}
+
 				screen.Update ();
 				break;
 			default:
@@ -246,7 +252,7 @@ namespace chippy8
 
 			++Cycles;
 			screen.Draw ();
-			Thread.Sleep (1000);
+			Thread.Sleep (1000 / 60);
 		}
 
 		public void ClearRegisters () {

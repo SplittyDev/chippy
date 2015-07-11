@@ -60,6 +60,7 @@
     <Compile Include="Emulator\Interfaces\IScreen.cs" />
     <Compile Include="Emulator\Managed\ManagedScreen.cs" />
     <Compile Include="Emulator\Addons\WinFormsDisplay.cs" />
+    <Compile Include="Emulator\Debugger.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

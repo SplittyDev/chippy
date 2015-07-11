@@ -28,6 +28,7 @@ namespace chippy8
 
 		bool stop;
 		bool running;
+		bool initialized;
 
 		Emulator () {
 			DelayTimer = new ManagedDelayTimer ();
@@ -71,7 +72,7 @@ namespace chippy8
 			Task.Factory.StartNew (Run);
 		}
 
-		public void Run () {
+		public void InitRun () {
 			stop = false;
 			running = false;
 
@@ -84,19 +85,36 @@ namespace chippy8
 				throw new Exception ("Please connect a IDisplay instance!");
 
 			// Initialization
-			Memory.Init ();
-			Cpu.Init ();
-			Screen.Init ();
-			DelayTimer.Init ();
-			SoundTimer.Init ();
+			if (!initialized) {
+				Memory.Init ();
+				Cpu.Init ();
+				Screen.Init ();
+				DelayTimer.Init ();
+				SoundTimer.Init ();
+				initialized = true;
+			}
 
 			running = true;
+		}
 
-			// Main loop
+		public void Run () {
+			InitRun ();
 			while (!stop) {
 				Cpu.RunCycle ();
 			}
 
+			running = false;
+		}
+
+		public void RunCycle () {
+			InitRun ();
+			Cpu.RunCycle ();
+			running = false;
+		}
+
+		public void BlindRunCycle () {
+			running = true;
+			Cpu.RunCycle ();
 			running = false;
 		}
 
