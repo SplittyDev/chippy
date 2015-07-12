@@ -14,6 +14,7 @@ namespace chippy8
 		delegate void MMTimerProc (UInt32 timerid, UInt32 msg, IntPtr user, UInt32 dw1, UInt32 dw2);
 		bool running;
 		bool halted;
+		bool initialized;
 		double frequency = 0;
 
 		public static Debugger Instance {
@@ -63,39 +64,66 @@ namespace chippy8
 			Frequency = 60; // 60hz
 		}
 
+		void Initialize () {
+			if (initialized)
+				return;
+			try {
+				Emulator.Instance.InitRun (clear_memory: false, set_run_flag: false);
+				initialized = true;
+			} catch {
+				initialized = false;
+			}
+		}
+
 		public void Pause () {
+			Initialize ();
+			if (!initialized)
+				return;
 			var wait = running;
 			running = false;
-			if (wait) {
-				while (!halted) {
-				}
-			}
+			if (wait)
+				while (!halted);
 		}
 
 		public void Continue () {
-			if (!running) {
-				running = true;
+			Initialize ();
+			if (!initialized)
+				return;
+			if (!running)
 				InternalRun ();
-			}
 		}
 
 		public void Stop () {
+			Initialize ();
+			if (!initialized)
+				return;
 			Pause ();
-			Emulator.Instance.ReinitRun (false);
+			Emulator.Instance.ReinitRun (clear_memory: false);
+			Emulator.Instance.Screen.Draw ();
 		}
 
 		public void Step () {
+			Initialize ();
+			if (!initialized)
+				return;
 			Emulator.Instance.BlindRunCycle ();
 		}
 
 		public void Restart () {
+			Initialize ();
+			if (!initialized)
+				return;
 			Pause ();
-			Emulator.Instance.ReinitRun (false);
+			Emulator.Instance.ReinitRun (clear_memory: false);
 			InternalRun ();
 		}
 
 		public void Run () {
-			InternalRun ();
+			Initialize ();
+			if (!initialized)
+				return;
+			if (!running)
+				InternalRun ();
 		}
 
 		void InternalRun () {

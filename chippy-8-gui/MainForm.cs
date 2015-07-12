@@ -12,8 +12,6 @@ namespace chippy8gui
 {
 	public class MainForm : Form
 	{
-		Debugger debugger;
-
 		public MainForm () {
 			InitializeComponents ();
 			InitializeLog ();
@@ -30,7 +28,6 @@ namespace chippy8gui
 		}
 
 		void InitializeEmulator () {
-			debugger = Debugger.Instance;
 			Emulator.Instance
 				.Connect<ManagedMemory> ()
 				.Connect<ManagedCPU> ()
@@ -56,26 +53,27 @@ namespace chippy8gui
 
 			// Program menu
 			var menu_program = new MenuItem ("Program");
-			menu_program.MenuItems.Add ("Load program", LoadProgram);
-			menu_program.MenuItems.Add ("Exit", delegate {
-				Application.Exit ();
-			});
+			menu_program.MenuItems.Add (new MenuItem ("Load program", LoadProgram, Shortcut.CtrlO));
+			menu_program.MenuItems.Add (new MenuItem ("Exit", (sender, e) => Application.Exit (), Shortcut.CtrlX));
 
 			// Emulator menu
 			var menu_emulator = new MenuItem ("Emulator");
+			menu_emulator.MenuItems.Add (new MenuItem ("Start", (sender, e) => Debugger.Instance.Continue (), Shortcut.AltUpArrow));
+			menu_emulator.MenuItems.Add (new MenuItem ("Pause", (sender, e) => Debugger.Instance.Pause (), Shortcut.AltDownArrow));
+			menu_emulator.MenuItems.Add (new MenuItem ("Stop", (sender, e) => Debugger.Instance.Stop (), Shortcut.AltLeftArrow));
+			menu_emulator.MenuItems.Add ("Restart", (sender, e) => Debugger.Instance.Restart ());
 
 			// Debug menu
 			var menu_debug = new MenuItem ("Debugger");
-			menu_debug.MenuItems.Add (new MenuItem ("Start", (sender, e) => Debugger.Instance.Continue (), Shortcut.AltUpArrow));
 			menu_debug.MenuItems.Add (new MenuItem ("Step", (sender, e) => Debugger.Instance.Step (), Shortcut.AltRightArrow));
-			menu_debug.MenuItems.Add (new MenuItem ("Pause", (sender, e) => Debugger.Instance.Pause (), Shortcut.AltDownArrow));
-			menu_debug.MenuItems.Add (new MenuItem ("Stop", (sender, e) => Debugger.Instance.Stop (), Shortcut.AltLeftArrow));
-			menu_debug.MenuItems.Add ("Restart", (sender, e) => Debugger.Instance.Restart ());
-			menu_debug.MenuItems.Add ("");
 			menu_debug.MenuItems.Add (new MenuItem ("Dump RAM", DumpRam, Shortcut.CtrlD));
 			menu_debug.MenuItems.Add (new MenuItem ("Dump ROM", DumpRom, Shortcut.CtrlShiftD));
 
-			menu.MenuItems.AddRange (new [] { menu_program, menu_emulator, menu_debug });
+			// Views menu
+			var menu_views = new MenuItem ("Views");
+			menu_views.MenuItems.Add (new MenuItem ("Registers", ShowRegisters, Shortcut.CtrlShiftR));
+
+			menu.MenuItems.AddRange (new [] { menu_program, menu_emulator, menu_debug, menu_views });
 			this.Menu = menu;
 			#endregion
 
@@ -102,19 +100,89 @@ namespace chippy8gui
 		}
 
 		void DumpRam (object sender, EventArgs e) {
+			var path = Path.Combine (Application.StartupPath, "ramdump.bin");
 			var ram = Emulator.Instance.DumpRam ();
-			using (var fs = new FileStream ("ramdump.bin", FileMode.Create, FileAccess.Write, FileShare.None))
+			using (var fs = new FileStream (path, FileMode.Create, FileAccess.Write, FileShare.None))
 			using (var writer = new BinaryWriter (fs)) {
 				writer.Write (ram);
 			}
 		}
 
 		void DumpRom (object sender, EventArgs e) {
+			var path = Path.Combine (Application.StartupPath, "romdump.bin");
 			var rom = Emulator.Instance.DumpRom ();
-			using (var fs = new FileStream ("romdump.bin", FileMode.Create, FileAccess.Write, FileShare.None))
+			using (var fs = new FileStream (path, FileMode.Create, FileAccess.Write, FileShare.None))
 			using (var writer = new BinaryWriter (fs)) {
 				writer.Write (rom);
 			}
+		}
+
+		bool registers_shown;
+		GroupBox gb_registers;
+		Label gb_registers_lblreg;
+		void ShowRegisters (object sender, EventArgs e) {
+			if (gb_registers == null) {
+				gb_registers = new GroupBox {
+					Dock = DockStyle.Right,
+					Width = 300,
+					Text = "Registers",
+				};
+				gb_registers_lblreg = new Label {
+					AutoSize = false,
+					Dock = DockStyle.Fill,
+					Font = new Font (FontFamily.GenericMonospace, 11.25f)
+				};
+				gb_registers.Controls.Add (gb_registers_lblreg);
+			}
+			if (!registers_shown) {
+				this.Controls.Add (gb_registers);
+				UpdateRegisters (update: true);
+				this.Width += 300;
+				gb_registers.Refresh ();
+				registers_shown = true;
+			} else {
+				this.Width -= 300;
+				UpdateRegisters (update: false);
+				this.Controls.Remove (gb_registers);
+				registers_shown = false;
+			}
+		}
+
+		bool update_registers;
+		void UpdateRegisters (bool update = true) {
+			if (update == false) {
+				update_registers = false;
+				return;
+			}
+			Task.Factory.StartNew (() => {
+				update_registers = true;
+				while (update_registers) {
+					Thread.Sleep (5);
+					if (gb_registers_lblreg == null)
+						continue;
+					var snap = Emulator.Instance.Cpu.Snapshot ();
+					this.Invoke (new MethodInvoker (() => {
+						gb_registers_lblreg.Text = string.Format (
+							"V0:    0x{0:X4} V8:    0x{8:X4}\n" +
+							"V1:    0x{1:X4} V9:    0x{9:X4}\n" +
+							"V2:    0x{2:X4} VA:    0x{10:X4}\n" +
+							"V3:    0x{3:X4} VB:    0x{11:X4}\n" +
+							"V4:    0x{4:X4} VC:    0x{12:X4}\n" +
+							"V5:    0x{5:X4} VD:    0x{13:X4}\n" +
+							"V6:    0x{6:X4} VE:    0x{14:X4}\n" +
+							"V7:    0x{7:X4} Carry: 0x{15:X4}\n" +
+							"Index: 0x{16:X4}\n" +
+							"PC:    0x{17:X4}\n" +
+							"SP:    0x{18:X4}",
+							snap.V0, snap.V1, snap.V2, snap.V3, snap.V4,
+							snap.V5, snap.V6, snap.V7, snap.V8, snap.V9,
+							snap.VA, snap.VB, snap.VC, snap.VD, snap.VE,
+							snap.Carry, snap.I, snap.PC, snap.SP
+						);
+						gb_registers_lblreg.Refresh ();
+					}));
+				}
+			});
 		}
 	}
 }

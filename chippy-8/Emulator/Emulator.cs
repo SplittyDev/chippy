@@ -72,7 +72,7 @@ namespace chippy8
 			Task.Factory.StartNew (Run);
 		}
 
-		public void InitRun (bool clear_memory = true) {
+		public void InitRun (bool clear_memory = true, bool set_run_flag = true) {
 			stop = false;
 			running = false;
 
@@ -95,7 +95,8 @@ namespace chippy8
 				initialized = true;
 			}
 
-			running = true;
+			if (set_run_flag)
+				running = true;
 		}
 
 		public void ReinitRun (bool clear_memory = true) {

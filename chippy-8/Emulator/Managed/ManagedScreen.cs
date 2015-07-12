@@ -42,10 +42,12 @@ namespace chippy8
 		}
 
 		public virtual void Update () {
+			// Set draw flag
 			draw = true;
 		}
 
 		public virtual void Draw () {
+			// Reset draw flag
 			draw = false;
 		}
 	}

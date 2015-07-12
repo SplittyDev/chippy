@@ -8,6 +8,7 @@ namespace chippy8
 		void RunCycle ();
 		void ClearRegisters ();
 		void ClearFlags ();
+		CpuSnapshot Snapshot ();
 	}
 }
 

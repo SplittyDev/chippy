@@ -22,7 +22,10 @@ namespace chippy8
 		public void PreInit () {
 			V = new byte[16];
 			rng = new Random ();
+		}
 
+		public CpuSnapshot Snapshot () {
+			return new CpuSnapshot (V, I, PC, SP);
 		}
 
 		public void Init () {
