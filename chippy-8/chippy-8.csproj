@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Platform)' != 'Unix'">
     <CscToolPath>$(MSBuildProgramFiles32)\MSBuild\14.0\Bin</CscToolPath>
@@ -43,6 +43,9 @@
     <Reference Include="hqxSharp">
       <HintPath>..\..\..\hqxSharp.dll</HintPath>
     </Reference>
+    <Reference Include="FastGraphicsLib">
+      <HintPath>..\..\..\..\Downloads\FastGraphicsLib\FastGraphicsLib.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -52,12 +55,12 @@
     <Compile Include="Emulator\Interfaces\IMemory.cs" />
     <Compile Include="Emulator\Managed\ManagedCPU.cs" />
     <Compile Include="Emulator\Managed\ManagedDelayTimer.cs" />
-    <Compile Include="Emulator\Managed\ManagedMemory.cs" />
     <Compile Include="Emulator\Managed\ManagedSoundTimer.cs" />
     <Compile Include="Emulator\EmulatorExtensions.cs" />
     <Compile Include="Emulator\Interfaces\IComponent.cs" />
     <Compile Include="Emulator\Interfaces\ICpu.cs" />
     <Compile Include="Emulator\Interfaces\IScreen.cs" />
+    <Compile Include="Emulator\Managed\ManagedMemory.cs" />
     <Compile Include="Emulator\Managed\ManagedScreen.cs" />
     <Compile Include="Emulator\Addons\WinFormsDisplay.cs" />
     <Compile Include="Emulator\Debugger.cs" />

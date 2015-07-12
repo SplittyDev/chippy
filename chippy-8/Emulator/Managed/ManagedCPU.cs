@@ -22,10 +22,11 @@ namespace chippy8
 		public void PreInit () {
 			V = new byte[16];
 			rng = new Random ();
+
 		}
 
 		public void Init () {
-			V.Initialize ();
+			Array.Clear (V, 0, V.Length);
 			mem = Emulator.Instance.Memory;
 			screen = Emulator.Instance.Screen;
 			Cycles = 0;
@@ -40,8 +41,6 @@ namespace chippy8
 			op = mem.Read16 (PC);
 			nibble = (byte)((op & 0xF000) >> 12);
 			PC += 2;
-
-			//Console.WriteLine ("Opcode: {0}", op.ToString ("X4"));
 
 			switch (nibble) {
 			// 0x0NNN
@@ -242,7 +241,6 @@ namespace chippy8
 						screen[(ushort)(px + py * 64)] = color;
 					}
 				}
-
 				screen.Update ();
 				break;
 			default:
@@ -252,7 +250,6 @@ namespace chippy8
 
 			++Cycles;
 			screen.Draw ();
-			Thread.Sleep (1000 / 60);
 		}
 
 		public void ClearRegisters () {

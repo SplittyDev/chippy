@@ -86,8 +86,8 @@ namespace chippy8
 
 			// Initialization
 			if (!initialized) {
-				Memory.Init ();
 				Cpu.Init ();
+				Memory.Init ();
 				Screen.Init ();
 				DelayTimer.Init ();
 				SoundTimer.Init ();
@@ -95,6 +95,12 @@ namespace chippy8
 			}
 
 			running = true;
+		}
+
+		public void ReinitRun () {
+			initialized = false;
+			InitRun ();
+			running = false;
 		}
 
 		public void Run () {

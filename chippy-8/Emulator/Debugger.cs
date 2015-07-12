@@ -1,18 +1,22 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
+using System.Diagnostics;
 
 namespace chippy8
 {
 	public class Debugger
 	{
-		delegate void MMTimerProc (UInt32 timerid, UInt32 msg, IntPtr user, UInt32 dw1, UInt32 dw2);
-		object syncLock = new object ();
-		bool running;
-		Debugger instance;
-		double frequency;
+		static object syncLock = new object ();
+		static Debugger instance;
 
-		public Debugger Instance {
+		delegate void MMTimerProc (UInt32 timerid, UInt32 msg, IntPtr user, UInt32 dw1, UInt32 dw2);
+		bool running;
+		bool halted;
+		double frequency = 0;
+
+		public static Debugger Instance {
 			get {
 				if (instance == null)
 					lock (syncLock)
@@ -59,28 +63,46 @@ namespace chippy8
 			Frequency = 60; // 60hz
 		}
 
-		public void Stop () {
-			running = false;
-		}
-
 		public void Pause () {
+			var wait = running;
 			running = false;
+			if (wait) {
+				while (!halted) {
+				}
+			}
 		}
 
 		public void Continue () {
 			running = true;
 		}
 
+		public void Stop () {
+			Pause ();
+			Emulator.Instance.ReinitRun ();
+		}
+
 		public void Step () {
 			Emulator.Instance.RunCycle ();
 		}
 
+		public void Restart () {
+			Stop ();
+			InternalRun ();
+		}
+
 		public void Run () {
+			Stop ();
+			InternalRun ();
+		}
+
+		void InternalRun () {
+			halted = false;
 			running = true;
+			Stopwatch watch = new Stopwatch ();
 			Task.Factory.StartNew (() => {
 				bool stopped = false;
 				Emulator.Instance.InitRun ();
-				while (true) {
+				while (running) {
 					if (stopped && running) {
 						stopped = false;
 						Emulator.Instance.InitRun ();
@@ -89,7 +111,9 @@ namespace chippy8
 						Emulator.Instance.BlindRunCycle ();
 					} else
 						stopped = true;
+					Thread.Sleep (1);
 				}
+				halted = true;
 			});
 		}
 	}

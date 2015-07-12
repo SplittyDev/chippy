@@ -12,27 +12,34 @@ namespace chippy8gui
 {
 	public class MainForm : Form
 	{
-		Emulator emulator;
-
-		RichTextBox log;
+		Debugger debugger;
 
 		public MainForm () {
 			InitializeComponents ();
 			InitializeLog ();
+		}
+
+		protected override void OnHandleCreated (EventArgs e)
+		{
 			InitializeEmulator ();
+			base.OnHandleCreated (e);
 		}
 
 		void InitializeLog () {
-			Console.SetOut (new ControlWriter (log));
+			//Console.SetOut (new ControlWriter (log));
 		}
 
 		void InitializeEmulator () {
-			emulator = Emulator.Instance;
-			emulator
+			debugger = Debugger.Instance;
+			Emulator.Instance
 				.Connect<ManagedMemory> ()
 				.Connect<ManagedCPU> ()
 				.Connect<WinFormsDisplay> ();
-			this.Controls.Add ((emulator.Screen as WinFormsDisplay));
+			var disp = (Emulator.Instance.Screen as WinFormsDisplay);
+			disp.AttachTo (this);
+			disp.Width = 640;
+			disp.Height = 320;
+			disp.Location = new Point (0, 0);
 		}
 
 		void InitializeComponents () {
@@ -40,8 +47,9 @@ namespace chippy8gui
 			this.FormBorderStyle = FormBorderStyle.FixedSingle;
 			this.Width = 640;
 			this.Height = 480;
+			this.BackColor = Color.FromArgb (230, 230, 230);
 			this.BackgroundImage = Image.FromFile ("default.png");
-			this.BackgroundImageLayout = ImageLayout.Center;
+			this.BackgroundImageLayout = ImageLayout.Zoom;
 
 			#region Menu
 			var menu = new MainMenu ();
@@ -55,35 +63,16 @@ namespace chippy8gui
 
 			// Emulator menu
 			var menu_emulator = new MenuItem ("Emulator");
-			menu_emulator.MenuItems.Add ("Soft reset", delegate {
-				emulator.SoftReset ();
-			});
-			menu_emulator.MenuItems.Add ("Hard reset (experimental)", delegate {
-				emulator.HardReset ();
-				InitializeEmulator ();
-			});
 
 			// Debug menu
-			var menu_debug = new MenuItem ("Debug");
+			var menu_debug = new MenuItem ("Debugger");
 			menu_debug.MenuItems.Add ("Dump RAM", DumpRam);
 
 			menu.MenuItems.AddRange (new [] { menu_program, menu_emulator, menu_debug });
 			this.Menu = menu;
 			#endregion
 
-			// Log RichTextBox
-			log = new RichTextBox {
-				Height = 100,
-				Dock = DockStyle.Bottom,
-				Text = "",
-				AutoWordSelection = false,
-				DetectUrls = true,
-				EnableAutoDragDrop = false,
-				ScrollBars = RichTextBoxScrollBars.ForcedVertical,
-				BorderStyle = BorderStyle.FixedSingle,
-				Multiline = true,
-			};
-			this.Controls.Add (log);
+			this.ClientSize = new Size (640, 320);
 		}
 
 		void LoadProgram (object sender, EventArgs e) {
@@ -99,16 +88,25 @@ namespace chippy8gui
 			};
 			var result = dialog.ShowDialog ();
 			if (result == DialogResult.OK) {
-				emulator.LoadFile (dialog.FileName);
-				emulator.RunTask ();
+				Debugger.Instance.Stop ();
+				Emulator.Instance.LoadFile (dialog.FileName);
+				Debugger.Instance.Run ();
 			}
 		}
 
 		void DumpRam (object sender, EventArgs e) {
-			var ram = emulator.DumpRom ();
-			using (var fs = new FileStream ("dump.bin", FileMode.Create, FileAccess.Write, FileShare.None))
+			var ram = Emulator.Instance.DumpRam ();
+			using (var fs = new FileStream ("ramdump.bin", FileMode.Create, FileAccess.Write, FileShare.None))
 			using (var writer = new BinaryWriter (fs)) {
 				writer.Write (ram);
+			}
+		}
+
+		void DumpRom (object sender, EventArgs e) {
+			var rom = Emulator.Instance.DumpRom ();
+			using (var fs = new FileStream ("romdump.bin", FileMode.Create, FileAccess.Write, FileShare.None))
+			using (var writer = new BinaryWriter (fs)) {
+				writer.Write (rom);
 			}
 		}
 	}

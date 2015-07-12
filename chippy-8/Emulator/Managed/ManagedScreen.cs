@@ -27,7 +27,7 @@ namespace chippy8
 		}
 
 		public virtual void Clear () {
-			vmem.Initialize ();
+			Array.Clear (vmem, 0, vmem.Length);
 			Console.WriteLine ("Cleared screen.");
 		}
 

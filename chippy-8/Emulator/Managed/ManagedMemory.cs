@@ -18,16 +18,15 @@ namespace chippy8
 		}
 
 		public void Init () {
-			this.Clear ();
 		}
 
 		public void Load (byte[] rom) {
-			Clear ();
+			this.Clear ();
 			Array.Copy (rom, 0, mem, 0x200, rom.Length <= 3584 ? rom.Length : 3584);
 		}
 
 		public void Clear () {
-			mem.Initialize ();
+			Array.Clear (mem, 0, mem.Length);
 			Console.WriteLine ("Zero-filled memory.");
 		}
 
