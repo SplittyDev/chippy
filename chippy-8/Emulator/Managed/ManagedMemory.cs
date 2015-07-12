@@ -29,7 +29,7 @@ namespace chippy8
 
 		public byte this [ushort i] {
 			get { return mem [i]; }
-			private set { mem [i] = value; }
+			set { mem [i] = value; }
 		}
 
 		public void PreInit () {

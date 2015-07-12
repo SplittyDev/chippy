@@ -24,14 +24,15 @@ namespace chippy8gui
 		}
 
 		void InitializeLog () {
-			//Console.SetOut (new ControlWriter (log));
+			Console.SetOut (new ControlWriter (txtlog));
 		}
 
 		void InitializeEmulator () {
 			Emulator.Instance
 				.Connect<ManagedMemory> ()
 				.Connect<ManagedCPU> ()
-				.Connect<WinFormsDisplay> ();
+				.Connect<WinFormsDisplay> ()
+				.Connect<VirtualKeypad> ();
 			var disp = (Emulator.Instance.Screen as WinFormsDisplay);
 			disp.AttachTo (this);
 			disp.Width = 640;
@@ -42,10 +43,10 @@ namespace chippy8gui
 		void InitializeComponents () {
 			this.StartPosition = FormStartPosition.CenterScreen;
 			this.FormBorderStyle = FormBorderStyle.FixedSingle;
-			this.Width = 640;
-			this.Height = 480;
 			this.BackColor = Color.FromArgb (230, 230, 230);
 			this.BackgroundImageLayout = ImageLayout.Zoom;
+			this.ClientSize = new Size (640, 320);
+			this.MaximizeBox = false;
 
 			#region Menu
 			var menu = new MainMenu ();
@@ -71,12 +72,26 @@ namespace chippy8gui
 			// Views menu
 			var menu_views = new MenuItem ("Views");
 			menu_views.MenuItems.Add (new MenuItem ("Registers", ShowRegisters, Shortcut.CtrlShiftR));
+			menu_views.MenuItems.Add (new MenuItem ("Log", ShowLog, Shortcut.CtrlShiftL));
 
 			menu.MenuItems.AddRange (new [] { menu_program, menu_emulator, menu_debug, menu_views });
 			this.Menu = menu;
 			#endregion
 
-			this.ClientSize = new Size (640, 320);
+			// txtlog
+			txtlog = new TextBox {
+				Multiline = true,
+				Dock = DockStyle.Bottom,
+				Height = 100
+			};
+
+			// lblregs
+			lblregs = new Label {
+				AutoSize = false,
+				Dock = DockStyle.Right,
+				Width = 298,
+				Font = new Font (FontFamily.GenericMonospace, 11.25f)
+			};
 		}
 
 		void LoadProgram (object sender, EventArgs e) {
@@ -117,28 +132,39 @@ namespace chippy8gui
 		}
 
 		bool registers_shown;
-		Label registers_lblreg;
+		Label lblregs;
 		void ShowRegisters (object sender, EventArgs e) {
-			if (registers_lblreg == null) {
-				registers_lblreg = new Label {
-					AutoSize = false,
-					Dock = DockStyle.Right,
-					Width = 298,
-					Font = new Font (FontFamily.GenericMonospace, 11.25f)
-				};
-			}
 			if (!registers_shown) {
-				this.Controls.Add (registers_lblreg);
+				this.Controls.Add (lblregs);
 				UpdateRegisters (update: true);
 				this.Width += 300;
-				registers_lblreg.Refresh ();
 				registers_shown = true;
 			} else {
 				this.Width -= 300;
 				UpdateRegisters (update: false);
-				this.Controls.Remove (registers_lblreg);
+				this.Controls.Remove (lblregs);
 				registers_shown = false;
 			}
+			lblregs.Refresh ();
+			this.Controls.Remove (txtlog);
+			this.Controls.Add (txtlog);
+			txtlog.Refresh ();
+		}
+
+		bool log_shown;
+		TextBox txtlog;
+		void ShowLog (object sender, EventArgs e) {
+			if (!log_shown) {
+				this.Controls.Add (txtlog);
+				this.Height += 100;
+				log_shown = true;
+			} else {
+				this.Height -= 100;
+				this.Controls.Remove (txtlog);
+				log_shown = false;
+			}
+			lblregs.Refresh ();
+			txtlog.Refresh ();
 		}
 
 		bool update_registers;
@@ -151,11 +177,11 @@ namespace chippy8gui
 				update_registers = true;
 				while (update_registers) {
 					Thread.Sleep (50);
-					if (registers_lblreg == null)
+					if (lblregs == null)
 						continue;
 					var snap = Emulator.Instance.Cpu.Snapshot ();
 					this.Invoke (new MethodInvoker (() => {
-						registers_lblreg.Text = string.Format (
+						lblregs.Text = string.Format (
 							"V0:    0x{0:X4} V8:    0x{8:X4}\n" +
 							"V1:    0x{1:X4} V9:    0x{9:X4}\n" +
 							"V2:    0x{2:X4} VA:    0x{10:X4}\n" +
@@ -172,7 +198,7 @@ namespace chippy8gui
 							snap.VA, snap.VB, snap.VC, snap.VD, snap.VE,
 							snap.Carry, snap.I, snap.PC, snap.SP
 						);
-						registers_lblreg.Update ();
+						lblregs.Update ();
 					}));
 				}
 			});

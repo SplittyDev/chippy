@@ -2,7 +2,7 @@
 
 namespace chippy8
 {
-	public interface IScreen : IComponent
+	public interface IDisplayDevice : IComponent
 	{
 		byte this [ushort i] { get; set; }
 		void Clear ();

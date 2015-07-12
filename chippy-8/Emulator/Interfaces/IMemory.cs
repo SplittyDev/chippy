@@ -5,7 +5,7 @@ namespace chippy8
 {
 	public interface IMemory : IComponent
 	{
-		byte this[ushort i] { get; }
+		byte this [ushort i] { get; set; }
 		void Clear ();
 		void Load (byte[] rom);
 		byte[] Dump ();

@@ -56,12 +56,14 @@
     <Compile Include="Emulator\EmulatorExtensions.cs" />
     <Compile Include="Emulator\Interfaces\IComponent.cs" />
     <Compile Include="Emulator\Interfaces\ICpu.cs" />
-    <Compile Include="Emulator\Interfaces\IScreen.cs" />
     <Compile Include="Emulator\Managed\ManagedMemory.cs" />
-    <Compile Include="Emulator\Managed\ManagedScreen.cs" />
     <Compile Include="Emulator\Addons\WinFormsDisplay.cs" />
     <Compile Include="Emulator\Debugger.cs" />
     <Compile Include="Emulator\CpuSnapshot.cs" />
+    <Compile Include="Emulator\Managed\VirtualScreen.cs" />
+    <Compile Include="Emulator\Managed\VirtualKeypad.cs" />
+    <Compile Include="Emulator\Interfaces\IDisplayDevice.cs" />
+    <Compile Include="Emulator\Interfaces\IInputDevice.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

@@ -2,7 +2,7 @@
 
 namespace chippy8
 {
-	public class ManagedScreen : IScreen
+	public class VirtualScreen : IDisplayDevice
 	{
 		public const byte WIDTH = 64;
 		public const byte HEIGHT = 32;
@@ -18,7 +18,7 @@ namespace chippy8
 		}
 
 		public virtual void PreInit () {
-			vmem = new byte[WIDTH * HEIGHT];
+			vmem = new byte [WIDTH * HEIGHT];
 			draw = false;
 		}
 

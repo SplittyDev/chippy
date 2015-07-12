@@ -22,7 +22,8 @@ namespace chippy8
 
 		public IMemory Memory;
 		public ICpu Cpu;
-		public IScreen Screen;
+		public IDisplayDevice Screen;
+		public IInputDevice Keypad;
 
 		bool stop;
 		bool running;
@@ -76,9 +77,11 @@ namespace chippy8
 			if (Memory == null)
 				throw new Exception ("Please connect a IMemory instance!");
 			if (Cpu == null)
-				throw new Exception ("Please connect a ICPU instance!");
+				throw new Exception ("Please connect a ICpu instance!");
 			if (Screen == null)
-				throw new Exception ("Please connect a IDisplay instance!");
+				throw new Exception ("Please connect a IDisplayDevice instance!");
+			if (Keypad == null)
+				throw new Exception ("Please connect a IInputDevice instance!");
 
 			// Initialization
 			if (!initialized) {
@@ -86,6 +89,7 @@ namespace chippy8
 				if (clear_memory)
 					Memory.Init ();
 				Screen.Init ();
+				Keypad.Init ();
 				initialized = true;
 			}
 

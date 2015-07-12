@@ -6,10 +6,10 @@ using hqx;
 
 namespace chippy8
 {
-	public class WinFormsDisplay : Control, IScreen
+	public class WinFormsDisplay : Control, IDisplayDevice
 	{
 		Bitmap bmp;
-		ManagedScreen screen;
+		VirtualScreen screen;
 		Form frm;
 		bool updating;
 
@@ -45,7 +45,7 @@ namespace chippy8
 		}
 
 		public void PreInit () {
-			screen = new ManagedScreen ();
+			screen = new VirtualScreen ();
 			screen.PreInit ();
 		}
 
@@ -57,7 +57,7 @@ namespace chippy8
 			screen.Clear ();
 		}
 
-		void IScreen.Update () {
+		void IDisplayDevice.Update () {
 			screen.Update ();
 		}
 

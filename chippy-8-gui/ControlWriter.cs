@@ -9,40 +9,28 @@ namespace chippy8gui
 	public class ControlWriter : TextWriter
 	{
 		string linebuf;
-		RichTextBox rtb;
+		TextBox tb;
 
 		public override Encoding Encoding { get; } = Encoding.ASCII;
 
-		public ControlWriter (RichTextBox rtb) {
-			this.rtb = rtb;
+		public ControlWriter (TextBox tb) {
+			this.tb = tb;
 		}
 
 		public override void Write (char value) {
-			if (value != '\n')
-				linebuf += value;
-			else
-				Task.Factory.StartNew (() => {
-					while (!rtb.IsHandleCreated) {
-					}
-					rtb.Invoke (new MethodInvoker (() => {
-						rtb.Text += linebuf;
-						linebuf = "";
-						FixNewlines ();
-					}));
-				});
+			linebuf += value;
+			Task.Factory.StartNew (() => {
+				while (!tb.IsHandleCreated) {
+				}
+				tb.Invoke (new MethodInvoker (() => {
+					tb.AppendText (linebuf);
+					linebuf = "";
+					tb.Update ();
+				}));
+			});
 		}
 
 		public override void Write (string value) {
-		}
-
-		void FixNewlines () {
-			rtb.Text = rtb.Text.Replace ("\n\n", "\n");
-			Scroll ();
-		}
-
-		void Scroll () {
-			rtb.SelectionStart = rtb.Text.Length;
-			rtb.ScrollToCaret ();
 		}
 	}
 }

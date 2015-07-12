@@ -13,8 +13,10 @@ namespace chippy8
 				emulator.Memory = com as IMemory;
 			else if (com is ICpu)
 				emulator.Cpu = com as ICpu;
-			else if (com is IScreen)
-				emulator.Screen = com as IScreen;
+			else if (com is IDisplayDevice)
+				emulator.Screen = com as IDisplayDevice;
+			else if (com is IInputDevice)
+				emulator.Keypad = com as IInputDevice;
 			else
 				throw new Exception ("Unsupported component.");
 			Console.Out.WriteLine ("Connected {0}", com.Identifier);
