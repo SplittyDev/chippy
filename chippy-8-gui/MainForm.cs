@@ -45,7 +45,6 @@ namespace chippy8gui
 			this.Width = 640;
 			this.Height = 480;
 			this.BackColor = Color.FromArgb (230, 230, 230);
-			this.BackgroundImage = Image.FromFile ("default.png");
 			this.BackgroundImageLayout = ImageLayout.Zoom;
 
 			#region Menu
@@ -118,32 +117,26 @@ namespace chippy8gui
 		}
 
 		bool registers_shown;
-		GroupBox gb_registers;
-		Label gb_registers_lblreg;
+		Label registers_lblreg;
 		void ShowRegisters (object sender, EventArgs e) {
-			if (gb_registers == null) {
-				gb_registers = new GroupBox {
-					Dock = DockStyle.Right,
-					Width = 300,
-					Text = "Registers",
-				};
-				gb_registers_lblreg = new Label {
+			if (registers_lblreg == null) {
+				registers_lblreg = new Label {
 					AutoSize = false,
-					Dock = DockStyle.Fill,
+					Dock = DockStyle.Right,
+					Width = 298,
 					Font = new Font (FontFamily.GenericMonospace, 11.25f)
 				};
-				gb_registers.Controls.Add (gb_registers_lblreg);
 			}
 			if (!registers_shown) {
-				this.Controls.Add (gb_registers);
+				this.Controls.Add (registers_lblreg);
 				UpdateRegisters (update: true);
 				this.Width += 300;
-				gb_registers.Refresh ();
+				registers_lblreg.Refresh ();
 				registers_shown = true;
 			} else {
 				this.Width -= 300;
 				UpdateRegisters (update: false);
-				this.Controls.Remove (gb_registers);
+				this.Controls.Remove (registers_lblreg);
 				registers_shown = false;
 			}
 		}
@@ -157,12 +150,12 @@ namespace chippy8gui
 			Task.Factory.StartNew (() => {
 				update_registers = true;
 				while (update_registers) {
-					Thread.Sleep (5);
-					if (gb_registers_lblreg == null)
+					Thread.Sleep (50);
+					if (registers_lblreg == null)
 						continue;
 					var snap = Emulator.Instance.Cpu.Snapshot ();
 					this.Invoke (new MethodInvoker (() => {
-						gb_registers_lblreg.Text = string.Format (
+						registers_lblreg.Text = string.Format (
 							"V0:    0x{0:X4} V8:    0x{8:X4}\n" +
 							"V1:    0x{1:X4} V9:    0x{9:X4}\n" +
 							"V2:    0x{2:X4} VA:    0x{10:X4}\n" +
@@ -179,7 +172,7 @@ namespace chippy8gui
 							snap.VA, snap.VB, snap.VC, snap.VD, snap.VE,
 							snap.Carry, snap.I, snap.PC, snap.SP
 						);
-						gb_registers_lblreg.Refresh ();
+						registers_lblreg.Update ();
 					}));
 				}
 			});

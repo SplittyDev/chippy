@@ -12,6 +12,8 @@ namespace chippy8
 		ushort PC; // Program counter
 		ushort SP; // Stack pointer
 		ushort SB; // Stack base address
+		byte DT; // Delay timer
+		byte ST; // Sound timer
 		Random rng;
 
 		IMemory mem;
@@ -245,6 +247,69 @@ namespace chippy8
 					}
 				}
 				screen.Update ();
+				break;
+			// 0xEX__
+			case 0xE:
+				x = (ushort)((op & 0x0F00) >> 8);
+				nn = (byte)(op & 0x00FF);
+				switch (nn) {
+				case 0x9E:
+					// Skips the next instruction if the key stored in V[X] is pressed
+					break;
+				case 0xA1:
+					// Skips the next instruction if the key stored in V[X] isn't pressed
+					break;
+				default:
+					Console.WriteLine ("Invalid opcode: 0xE{0:X}{1:X2}", x, nn);
+					break;
+				}
+				break;
+			// 0xF__
+			case 0xF:
+				x = (ushort)((op & 0x0F00) >> 8);
+				nn = (byte)(op & 0x00FF);
+				switch (nn) {
+				case 0x07:
+					// Sets V[X] to the value of the delay timer
+					V [x] = DT;
+					break;
+				case 0x0A:
+					// A key press is awaited, and then stored in V[X]
+					break;
+				case 0x15:
+					// Sets the delay timer to V[X]
+					DT = V [x];
+					break;
+				case 0x18:
+					// Sets the sound timer to V[X]
+					ST = V [x];
+					break;
+				case 0x1E:
+					// Adds V[X] to I
+					I += V [x];
+					break;
+				case 0x29:
+					// Sets I to the location of the sprite for the character in V[X]
+					// Characters 0-F (in hexadecimal) are represented by a 4x5 font
+					break;
+				case 0x33:
+					// Stores the Binary-coded decimal representation of V[X],
+					// with the most significant of three digits at the address in I,
+					// the middle digit at I plus 1, and the least significant digit at I plus 2.
+					// (In other words, take the decimal representation of VX,
+					// place the hundreds digit in memory at location in I,
+					// the tens digit at location I+1, and the ones digit at location I+2.)
+					break;
+				case 0x55:
+					// Stores V[0] to V[X] in memory starting at address I
+					break;
+				case 0x56:
+					// Fills V[0] to V[X] with values from memory starting at address I
+					break;
+				default:
+					Console.WriteLine ("Invalid opcode: 0xE{0:X}{1:X2}", x, nn);
+					break;
+				}
 				break;
 			default:
 				Console.WriteLine ("Invalid opcode: 0x{0:X4}", nibble);

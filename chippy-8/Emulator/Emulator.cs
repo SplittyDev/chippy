@@ -23,16 +23,12 @@ namespace chippy8
 		public IMemory Memory;
 		public ICpu Cpu;
 		public IScreen Screen;
-		public IHardwareRegister DelayTimer;
-		public IHardwareRegister SoundTimer;
 
 		bool stop;
 		bool running;
 		bool initialized;
 
 		Emulator () {
-			DelayTimer = new ManagedDelayTimer ();
-			SoundTimer = new ManagedSoundTimer ();
 		}
 
 		public void Load (byte[] rom) {
@@ -90,8 +86,6 @@ namespace chippy8
 				if (clear_memory)
 					Memory.Init ();
 				Screen.Init ();
-				DelayTimer.Init ();
-				SoundTimer.Init ();
 				initialized = true;
 			}
 
