@@ -72,7 +72,7 @@ namespace chippy8
 			Task.Factory.StartNew (Run);
 		}
 
-		public void InitRun () {
+		public void InitRun (bool clear_memory = true) {
 			stop = false;
 			running = false;
 
@@ -87,7 +87,8 @@ namespace chippy8
 			// Initialization
 			if (!initialized) {
 				Cpu.Init ();
-				Memory.Init ();
+				if (clear_memory)
+					Memory.Init ();
 				Screen.Init ();
 				DelayTimer.Init ();
 				SoundTimer.Init ();
@@ -97,9 +98,9 @@ namespace chippy8
 			running = true;
 		}
 
-		public void ReinitRun () {
+		public void ReinitRun (bool clear_memory = true) {
 			initialized = false;
-			InitRun ();
+			InitRun (clear_memory);
 			running = false;
 		}
 

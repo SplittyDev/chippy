@@ -66,7 +66,14 @@ namespace chippy8gui
 
 			// Debug menu
 			var menu_debug = new MenuItem ("Debugger");
-			menu_debug.MenuItems.Add ("Dump RAM", DumpRam);
+			menu_debug.MenuItems.Add (new MenuItem ("Start", (sender, e) => Debugger.Instance.Continue (), Shortcut.AltUpArrow));
+			menu_debug.MenuItems.Add (new MenuItem ("Step", (sender, e) => Debugger.Instance.Step (), Shortcut.AltRightArrow));
+			menu_debug.MenuItems.Add (new MenuItem ("Pause", (sender, e) => Debugger.Instance.Pause (), Shortcut.AltDownArrow));
+			menu_debug.MenuItems.Add (new MenuItem ("Stop", (sender, e) => Debugger.Instance.Stop (), Shortcut.AltLeftArrow));
+			menu_debug.MenuItems.Add ("Restart", (sender, e) => Debugger.Instance.Restart ());
+			menu_debug.MenuItems.Add ("");
+			menu_debug.MenuItems.Add (new MenuItem ("Dump RAM", DumpRam, Shortcut.CtrlD));
+			menu_debug.MenuItems.Add (new MenuItem ("Dump ROM", DumpRom, Shortcut.CtrlShiftD));
 
 			menu.MenuItems.AddRange (new [] { menu_program, menu_emulator, menu_debug });
 			this.Menu = menu;

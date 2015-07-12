@@ -73,25 +73,28 @@ namespace chippy8
 		}
 
 		public void Continue () {
-			running = true;
+			if (!running) {
+				running = true;
+				InternalRun ();
+			}
 		}
 
 		public void Stop () {
 			Pause ();
-			Emulator.Instance.ReinitRun ();
+			Emulator.Instance.ReinitRun (false);
 		}
 
 		public void Step () {
-			Emulator.Instance.RunCycle ();
+			Emulator.Instance.BlindRunCycle ();
 		}
 
 		public void Restart () {
-			Stop ();
+			Pause ();
+			Emulator.Instance.ReinitRun (false);
 			InternalRun ();
 		}
 
 		public void Run () {
-			Stop ();
 			InternalRun ();
 		}
 

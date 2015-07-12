@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 using System.Drawing;
+using System.Drawing.Imaging;
 using hqx;
 
 namespace chippy8
@@ -84,8 +85,6 @@ namespace chippy8
 					for (var x = 0; x < 64; x++)
 						if (screen.CheckPixel ((ushort)(x + y * 64)))
 							bmp.SetPixel (x, y, Color.White);
-				//var scaleY = this.Height / 32;
-				//var scaleX = this.Width / 64;
 				screen.draw = false;
 				updating = false;
 			}

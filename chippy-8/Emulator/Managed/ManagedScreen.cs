@@ -24,6 +24,8 @@ namespace chippy8
 
 		public virtual void Init () {
 			Clear ();
+			// Draw to make sure that the screen really gets cleared
+			draw = true;
 		}
 
 		public virtual void Clear () {
