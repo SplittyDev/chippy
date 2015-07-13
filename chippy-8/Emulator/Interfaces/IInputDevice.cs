@@ -6,6 +6,7 @@ namespace chippy8
 	{
 		ushort Await ();
 		void Send (ushort pos);
+		bool CheckKey (ushort pos);
 	}
 }
 

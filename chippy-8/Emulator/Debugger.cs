@@ -142,7 +142,7 @@ namespace chippy8
 						Emulator.Instance.BlindRunCycle ();
 					} else
 						stopped = true;
-					Thread.Sleep (1);
+					//Thread.Sleep (1);
 				}
 				halted = true;
 			});

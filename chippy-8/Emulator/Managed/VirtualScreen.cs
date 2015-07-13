@@ -12,7 +12,7 @@ namespace chippy8
 
 		public virtual string Identifier { get; } = "Virtual screen";
 
-		public byte this [ushort i] {
+		public byte this [int i] {
 			get { return vmem [i]; }
 			set { vmem [i] = value; }
 		}
@@ -33,11 +33,11 @@ namespace chippy8
 			Console.WriteLine ("Cleared screen.");
 		}
 
-		public virtual bool CheckPixel (ushort pos) {
+		public virtual bool CheckPixel (int pos) {
 			return vmem [pos] == 1;
 		}
 
-		public virtual void SetPixel (ushort pos) {
+		public virtual void SetPixel (int pos) {
 			vmem [pos] ^= 1;
 		}
 

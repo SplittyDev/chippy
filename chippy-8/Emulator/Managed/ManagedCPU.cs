@@ -8,10 +8,10 @@ namespace chippy8
 		public int Cycles { get; private set; }
 
 		byte[] V; // Registers
-		ushort I; // Index register
-		ushort PC; // Program counter
-		ushort SP; // Stack pointer
-		ushort SB; // Stack base address
+		short I; // Index register
+		short PC; // Program counter
+		short SB; // Stack base address
+		byte SP; // Stack pointer
 		byte DT; // Delay timer
 		byte ST; // Sound timer
 		Random rng;
@@ -35,17 +35,17 @@ namespace chippy8
 		}
 
 		public void RunCycle () {
-			ushort op;
-			op = Emulator.Instance.Memory.Read16 (PC);
-			PC += 2;
-			ushort nnn = (ushort)(op & 0x0FFF);
-			ushort x = (ushort)((op & 0x0F00) >> 8);
-			ushort y = (ushort)((op & 0x00F0) >> 4);
-			byte nibble = (byte)((op & 0xF000) >> 12);
-			byte nn = (byte)(op & 0x00FF);
-			byte n = (byte)(op & 0x000F);
+			ushort instr = (ushort)Emulator.Instance.Memory.Read16 (PC);
+			short nnn = (short)(instr & 0x0FFF);
+			byte op = (byte)((instr & 0xF000) >> 12);
+			byte x = (byte)((instr & 0x0F00) >> 8);
+			byte y = (byte)((instr & 0x00F0) >> 4);
+			byte n = (byte)(instr & 0x000F);
+			byte nn = (byte)(instr & 0x00FF);
 
-			switch (nibble) {
+			PC += 2;
+
+			switch (op) {
 			// 0x0NNN
 			// 0x00E0
 			// 0x00EE
@@ -59,11 +59,11 @@ namespace chippy8
 					Emulator.Instance.Screen.Update ();
 					break;
 				case 0xEE:
-					PC = Emulator.Instance.Memory.Read16 ((ushort)(SB + SP));
+					PC = Emulator.Instance.Memory.Read16 (SB + SP);
 					SP -= 2;
 					break;
 				default:
-					Console.WriteLine ("Invalid opcode: 0x00{0:X2}", nn);
+					Console.WriteLine ("Invalid opcode: 0x{0:X4}", op);
 					break;
 				}
 				break;
@@ -76,7 +76,7 @@ namespace chippy8
 			case 0x2:
 				// Calls subroutine at NNN
 				SP += 2;
-				Emulator.Instance.Memory.Write16 (PC, (ushort)(SB + SP));
+				Emulator.Instance.Memory.Write16 (SB + SP, PC);
 				PC = nnn;
 				break;
 			// 0x3XNN
@@ -136,7 +136,7 @@ namespace chippy8
 					// V[0xF] is set to 1 when there is a carry,
 					// and to 0 when there is not
 					V [0xF] = 0;
-					if ((V[x] + V[y]) > 255)
+					if ((V[x] + V[y]) > 0xFF)
 						V [0xF] = 1;
 					V [x] = (byte)((V [x] + V [y]) & 0xFF);
 					break;
@@ -145,9 +145,9 @@ namespace chippy8
 					// V[Y] is subtracted from V[X]
 					// V[0xF] is set to 0 when there is a borrow,
 					// and 1 when there is not
-					V [0xF] = 1;
-					if (V [x] < V [y])
-						V [0xF] = 0;
+					V [0xF] = 0;
+					if (V [x] > V [y])
+						V [0xF] = 1;
 					V [x] = (byte)((V [x] - V [y]) & 0xFF);
 					break;
 				// 0x8XY6
@@ -155,7 +155,7 @@ namespace chippy8
 					// Shifts V[X] right by one
 					// V[0xF] is set to the value of the least
 					// significant bit of V[X] before the shift
-					V [0xF] = (byte)(V[x] & 0xFF);
+					V [0xF] = (byte)(V[x] & 1);
 					V [x] >>= 1;
 					break;
 				// 0x8XY7
@@ -163,9 +163,9 @@ namespace chippy8
 					// Sets V[X] to V[Y] minus V[X]
 					// V[0xF] is set to 0 when there is a borrow,
 					// and 1 when there is not
-					V [0xF] = 1;
-					if (V [x] < (V [y] - V [x]))
-						V [0xF] = 0;
+					V [0xF] = 0;
+					if (V [y] > V [x])
+						V [0xF] = 1;
 					V [x] = (byte)((V [y] - V [x]) & 0xFF);
 					break;
 				// 0x8XYE
@@ -177,7 +177,7 @@ namespace chippy8
 					V [x] <<= 1;
 					break;
 				default:
-					Console.WriteLine ("Invalid opcode: 0x8{0:X}{1:X}{2:X}", x, y, n);
+					Console.WriteLine ("Invalid opcode: 0x{0:X4}", op);
 					break;
 				}
 				break;
@@ -195,7 +195,7 @@ namespace chippy8
 			// 0xBNNN
 			case 0xB:
 				// Jumps to the address NNN plus V[0x0]
-				PC = (ushort)(nnn + V [0x0]);
+				PC = (short)(nnn + V [0x0]);
 				break;
 			// 0xCXNN
 			case 0xC:
@@ -219,12 +219,12 @@ namespace chippy8
 						px = (byte)((V[x] + xx) % 64);
 						if (px < 0 || px > 64)
 							continue;
-						byte color = (byte)((Emulator.Instance.Memory [(ushort)(I + yy)] >> (7 - xx)) & 1);
-						byte col = Emulator.Instance.Screen [(ushort)(px + py * 64)];
+						byte color = (byte)((Emulator.Instance.Memory [I + yy] >> (7 - xx)) & 1);
+						byte col = Emulator.Instance.Screen [px + py * 64];
 						if (color > 0 && col > 0)
 							V[0xF] = 1;
 						color ^= col;
-						Emulator.Instance.Screen [(ushort)(px + py * 64)] = color;
+						Emulator.Instance.Screen [px + py * 64] = color;
 					}
 				}
 				Emulator.Instance.Screen.Update ();
@@ -235,17 +235,17 @@ namespace chippy8
 				// 0xEX9E
 				case 0x9E:
 					// Skips the next instruction if the key stored in V[X] is pressed
-					if (V [x] == 1)
+					if (Emulator.Instance.Keypad.CheckKey (V [x]))
 						PC += 2;
 					break;
 				// 0xEXA1
 				case 0xA1:
 					// Skips the next instruction if the key stored in V[X] isn't pressed
-					if (V [x] == 0)
+					if (!Emulator.Instance.Keypad.CheckKey (V [x]))
 						PC += 2;
 					break;
 				default:
-					Console.WriteLine ("Invalid opcode: 0xE{0:X}{1:X2}", x, nn);
+					Console.WriteLine ("Invalid opcode: 0x{0:X4}", op);
 					break;
 				}
 				break;
@@ -276,7 +276,7 @@ namespace chippy8
 				case 0x29:
 					// Sets I to the location of the sprite for the character in V[X]
 					// Characters 0-F (in hexadecimal) are represented by a 4x5 font
-					I = (ushort)(V [x] * 5);
+					I = (short)(V [x] * 5);
 					break;
 				case 0x33:
 					// Stores the Binary-coded decimal representation of V[X],
@@ -285,27 +285,27 @@ namespace chippy8
 					// (In other words, take the decimal representation of VX,
 					// place the hundreds digit in Emulator.Instance.Memoryory at location in I,
 					// the tens digit at location I+1, and the ones digit at location I+2.)
-					Emulator.Instance.Memory.Write8 (I, (byte)(V [x] / 100));
-					Emulator.Instance.Memory.Write8 ((ushort)(I + 1), (byte)((V [x] / 10) % 10));
-					Emulator.Instance.Memory.Write8 ((ushort)(I + 2), (byte)((V [x] / 100) % 10));
+					Emulator.Instance.Memory[I] = (byte)(V [x] / 100);
+					Emulator.Instance.Memory[I + 1] = (byte)((V [x] / 10) % 10);
+					Emulator.Instance.Memory[I + 2] = (byte)((V [x] / 100) % 10);
 					break;
 				case 0x55:
 					// Stores V[0] to V[X] in Emulator.Instance.Memoryory starting at address I
-					for (var i = 0; i < x; i++)
-						Emulator.Instance.Memory.Write8 ((ushort)(I + i), V [i]);
+					for (var i = 0; i <= x; i++)
+						Emulator.Instance.Memory.Write8 (I + i, V [i]);
 					break;
-				case 0x56:
+				case 0x65:
 					// Fills V[0] to V[X] with values from Emulator.Instance.Memoryory starting at address I
-					for (var i = 0; i < x; i++)
-						V [i] = Emulator.Instance.Memory.Read8 ((ushort)(I + i));
+					for (var i = 0; i <= x; i++)
+						V [i] = Emulator.Instance.Memory [I + i];
 					break;
 				default:
-					Console.WriteLine ("Invalid opcode: 0xE{0:X2}{1:X2}", x, nn);
+					Console.WriteLine ("Invalid opcode: 0x{0:X4}", op);
 					break;
 				}
 				break;
 			default:
-				Console.WriteLine ("Invalid opcode: 0x{0:X}", nibble);
+				Console.WriteLine ("Invalid opcode: 0x{0:X4}", op);
 				break;
 			}
 

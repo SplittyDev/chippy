@@ -27,7 +27,7 @@ namespace chippy8
 
 		public string Identifier { get; } = "Memory";
 
-		public byte this [ushort i] {
+		public byte this [int i] {
 			get { return mem [i]; }
 			set { mem [i] = value; }
 		}
@@ -43,13 +43,14 @@ namespace chippy8
 
 		public void Load (byte[] rom) {
 			Clear ();
-			LoadFont ();
 			Array.Copy (rom, 0, mem, 0x200, rom.Length <= 3584 ? rom.Length : 3584);
 		}
 
 		public void Clear () {
 			Array.Clear (mem, 0, mem.Length);
 			Console.WriteLine ("Zero-filled memory.");
+			LoadFont ();
+			Console.WriteLine ("Loaded font map.");
 		}
 
 		public byte[] Dump () {
@@ -62,25 +63,25 @@ namespace chippy8
 			return tmp;
 		}
 
-		public byte Read8 (ushort addr) {
+		public byte Read8 (int addr) {
 			return this [addr];
 		}
 
-		public ushort Read16 (ushort addr) {
-			return (ushort)(mem[addr] << 8 | mem[(ushort)(addr + 1)]);
+		public short Read16 (int addr) {
+			return (short)(mem[addr] << 8 | mem[addr + 1]);
 		}
 
-		public void Write8 (ushort addr, byte val) {
+		public void Write8 (int addr, byte val) {
 			this [addr] = val;
 		}
 
-		public void Write16 (ushort addr, ushort val) {
+		public void Write16 (int addr, short val) {
 			this [addr] = (byte)((val >> 8) & 0xFF);
-			this [(ushort)(addr + 1)] = (byte)(val & 0xFF);
+			this [addr + 1] = (byte)(val & 0xFF);
 		}
 
 		void LoadFont () {
-			Array.Copy (font, 0, mem, 0x50, font.Length);
+			Array.Copy (font, 0, mem, 0, font.Length);
 		}
 	}
 }

@@ -12,6 +12,9 @@ namespace chippy8gui
 {
 	public class MainForm : Form
 	{
+		FileStream log;
+		StreamWriter logWriter;
+
 		public MainForm () {
 			InitializeComponents ();
 			InitializeLog ();
@@ -23,8 +26,18 @@ namespace chippy8gui
 			base.OnHandleCreated (e);
 		}
 
+		protected override void OnClosing (System.ComponentModel.CancelEventArgs e)
+		{
+			logWriter.Close ();
+			log.Close ();
+			base.OnClosing (e);
+		}
+
 		void InitializeLog () {
-			Console.SetOut (new ControlWriter (txtlog));
+			log = new FileStream (Path.Combine (Application.StartupPath, "log.txt"), FileMode.OpenOrCreate);
+			logWriter = new StreamWriter (log);
+			logWriter.AutoFlush = true;
+			Console.SetOut (logWriter);
 		}
 
 		void InitializeEmulator () {
@@ -45,7 +58,6 @@ namespace chippy8gui
 			this.FormBorderStyle = FormBorderStyle.FixedSingle;
 			this.BackColor = Color.FromArgb (230, 230, 230);
 			this.BackgroundImageLayout = ImageLayout.Zoom;
-			this.ClientSize = new Size (640, 320);
 			this.MaximizeBox = false;
 
 			#region Menu
@@ -72,26 +84,19 @@ namespace chippy8gui
 			// Views menu
 			var menu_views = new MenuItem ("Views");
 			menu_views.MenuItems.Add (new MenuItem ("Registers", ShowRegisters, Shortcut.CtrlShiftR));
-			menu_views.MenuItems.Add (new MenuItem ("Log", ShowLog, Shortcut.CtrlShiftL));
 
 			menu.MenuItems.AddRange (new [] { menu_program, menu_emulator, menu_debug, menu_views });
 			this.Menu = menu;
 			#endregion
 
-			// txtlog
-			txtlog = new TextBox {
-				Multiline = true,
-				Dock = DockStyle.Bottom,
-				Height = 100
-			};
-
-			// lblregs
 			lblregs = new Label {
 				AutoSize = false,
 				Dock = DockStyle.Right,
 				Width = 298,
 				Font = new Font (FontFamily.GenericMonospace, 11.25f)
 			};
+
+			this.ClientSize = new Size (640, 320);
 		}
 
 		void LoadProgram (object sender, EventArgs e) {
@@ -138,6 +143,7 @@ namespace chippy8gui
 				this.Controls.Add (lblregs);
 				UpdateRegisters (update: true);
 				this.Width += 300;
+				lblregs.Refresh ();
 				registers_shown = true;
 			} else {
 				this.Width -= 300;
@@ -145,26 +151,6 @@ namespace chippy8gui
 				this.Controls.Remove (lblregs);
 				registers_shown = false;
 			}
-			lblregs.Refresh ();
-			this.Controls.Remove (txtlog);
-			this.Controls.Add (txtlog);
-			txtlog.Refresh ();
-		}
-
-		bool log_shown;
-		TextBox txtlog;
-		void ShowLog (object sender, EventArgs e) {
-			if (!log_shown) {
-				this.Controls.Add (txtlog);
-				this.Height += 100;
-				log_shown = true;
-			} else {
-				this.Height -= 100;
-				this.Controls.Remove (txtlog);
-				log_shown = false;
-			}
-			lblregs.Refresh ();
-			txtlog.Refresh ();
 		}
 
 		bool update_registers;
@@ -180,7 +166,7 @@ namespace chippy8gui
 					if (lblregs == null)
 						continue;
 					var snap = Emulator.Instance.Cpu.Snapshot ();
-					this.Invoke (new MethodInvoker (() => {
+					this.BeginInvoke (new MethodInvoker (() => {
 						lblregs.Text = string.Format (
 							"V0:    0x{0:X4} V8:    0x{8:X4}\n" +
 							"V1:    0x{1:X4} V9:    0x{9:X4}\n" +
@@ -189,7 +175,7 @@ namespace chippy8gui
 							"V4:    0x{4:X4} VC:    0x{12:X4}\n" +
 							"V5:    0x{5:X4} VD:    0x{13:X4}\n" +
 							"V6:    0x{6:X4} VE:    0x{14:X4}\n" +
-							"V7:    0x{7:X4} Carry: 0x{15:X4}\n" +
+							"V7:    0x{7:X4} Flag:  0x{15:X4}\n" +
 							"Index: 0x{16:X4}\n" +
 							"PC:    0x{17:X4}\n" +
 							"SP:    0x{18:X4}",
@@ -198,7 +184,7 @@ namespace chippy8gui
 							snap.VA, snap.VB, snap.VC, snap.VD, snap.VE,
 							snap.Carry, snap.I, snap.PC, snap.SP
 						);
-						lblregs.Update ();
+						lblregs.Refresh ();
 					}));
 				}
 			});

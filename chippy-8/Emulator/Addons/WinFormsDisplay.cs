@@ -16,7 +16,6 @@ namespace chippy8
 		public WinFormsDisplay () {
 			Width = 64;
 			Height = 32;
-			bmp = new Bitmap (Width, Height);
 			SetStyle (ControlStyles.AllPaintingInWmPaint, true);
 			SetStyle (ControlStyles.OptimizedDoubleBuffer, true);
 			SetStyle (ControlStyles.ResizeRedraw, true);
@@ -39,7 +38,7 @@ namespace chippy8
 		}
 
 		public string Identifier { get; } = "WinForms display control";
-		public byte this [ushort i] {
+		public byte this [int i] {
 			get { return screen [i]; }
 			set { screen [i] = value; }
 		}
@@ -47,6 +46,7 @@ namespace chippy8
 		public void PreInit () {
 			screen = new VirtualScreen ();
 			screen.PreInit ();
+			bmp = new Bitmap (Width, Height);
 		}
 
 		public void Init () {
@@ -61,11 +61,11 @@ namespace chippy8
 			screen.Update ();
 		}
 
-		public bool CheckPixel (ushort pos) {
+		public bool CheckPixel (int pos) {
 			return screen.CheckPixel (pos);
 		}
 
-		public void SetPixel (ushort pos) {
+		public void SetPixel (int pos) {
 			screen.SetPixel (pos);
 		}
 
@@ -99,7 +99,6 @@ namespace chippy8
 			if (bmp != null)
 				e.Graphics.DrawImage (bmp, e.ClipRectangle);
 			e.Graphics.DrawString (string.Format ("Cycle {0}", Emulator.Instance.Cpu.Cycles), SystemFonts.DefaultFont, Brushes.Gray, new Point (3, 3));
-			base.OnPaint (e);
 		}
 	}
 }

@@ -5,15 +5,15 @@ namespace chippy8
 {
 	public interface IMemory : IComponent
 	{
-		byte this [ushort i] { get; set; }
+		byte this [int i] { get; set; }
 		void Clear ();
 		void Load (byte[] rom);
 		byte[] Dump ();
 		byte[] DumpRom ();
-		void Write8 (ushort addr, byte val);
-		byte Read8 (ushort addr);
-		void Write16 (ushort addr, ushort val);
-		ushort Read16 (ushort addr);
+		void Write8 (int addr, byte val);
+		byte Read8 (int addr);
+		void Write16 (int addr, short val);
+		short Read16 (int addr);
 	}
 }
 

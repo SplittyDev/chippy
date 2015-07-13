@@ -7,11 +7,11 @@ namespace chippy8
 		public byte V0, V1, V2, V3, V4, V5, V6, V7;
 		public byte V8, V9, VA, VB, VC, VD, VE;
 		public byte Carry;
-		public ushort I;
-		public ushort PC;
-		public ushort SP;
+		public short I;
+		public short PC;
+		public short SP;
 
-		public CpuSnapshot (byte[] V, ushort I, ushort PC, ushort SP) {
+		public CpuSnapshot (byte[] V, short I, short PC, short SP) {
 			V0 = V [0x0];
 			V1 = V [0x1];
 			V2 = V [0x2];
