@@ -33,18 +33,8 @@ namespace chippy8
 		}
 
 		public void Init () {
-			Array.Clear (V, 0, V.Length);
-			endless_loop_msg = false;
-			invalid_mem_region_msg = false;
-			loopcount = 0;
-			prevPC = 0;
-			Cycles = 0;
-			PC = 0x200;
-			SB = 0xEA0;
-			SP = 0;
-			DT = 0;
-			ST = 0;
-			I = 0;
+			ClearRegisters ();
+			ClearFlags ();
 		}
 
 		public void RunCycle () {
@@ -59,7 +49,7 @@ namespace chippy8
 			}
 
 			// Endless loop
-			else if (loopcount > 100) {
+			else if (loopcount > 1000) {
 				if (!endless_loop_msg) {
 					Console.WriteLine ("Endless loop detected.");
 					endless_loop_msg = true;
@@ -358,11 +348,22 @@ namespace chippy8
 		}
 
 		public void ClearRegisters () {
-			V.Initialize ();
+			Array.Clear (V, 0, V.Length);
 			Console.WriteLine ("Zero-filled registers.");
 		}
 
 		public void ClearFlags () {
+			endless_loop_msg = false;
+			invalid_mem_region_msg = false;
+			loopcount = 0;
+			prevPC = 0;
+			Cycles = 0;
+			PC = 0x200;
+			SB = 0xEA0;
+			SP = 0;
+			DT = 0;
+			ST = 0;
+			I = 0;
 			Console.WriteLine ("Cleared flags.");
 		}
 	}
