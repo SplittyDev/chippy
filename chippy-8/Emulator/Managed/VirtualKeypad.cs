@@ -11,7 +11,6 @@ namespace chippy8
 
 		public void PreInit () {
 			keys = new byte[16];
-			buf = -1;
 		}
 
 		public void Init () {
@@ -30,11 +29,20 @@ namespace chippy8
 		}
 
 		public void Send (ushort key) {
+			SetKey (key);
+		}
+
+		public void SetKey (ushort key) {
 			buf = (short)key;
+			keys [key] = 1;
+		}
+
+		public void UnsetKey (ushort key) {
+			keys [key] = 0;
 		}
 
 		public bool CheckKey (ushort pos) {
-			return keys [pos] != 0;
+			return keys [pos] == 1;
 		}
 
 		public bool KeyAvailable () {

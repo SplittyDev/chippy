@@ -64,6 +64,7 @@
     <Compile Include="Emulator\Managed\VirtualKeypad.cs" />
     <Compile Include="Emulator\Interfaces\IDisplayDevice.cs" />
     <Compile Include="Emulator\Interfaces\IInputDevice.cs" />
+    <Compile Include="Emulator\Addons\WinFormsKeyboard.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

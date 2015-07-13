@@ -348,7 +348,7 @@ namespace chippy8
 
 			if (ST > 0) {
 				ST--;
-				Console.Beep ();
+				System.Threading.Tasks.Task.Factory.StartNew (() => Console.Beep (300, 100));
 			}
 
 			++Cycles;

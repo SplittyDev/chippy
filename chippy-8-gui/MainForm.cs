@@ -45,7 +45,8 @@ namespace chippy8gui
 				.Connect<ManagedMemory> ()
 				.Connect<ManagedCPU> ()
 				.Connect<WinFormsDisplay> ()
-				.Connect<VirtualKeypad> ();
+				.Connect<WinFormsKeyboard> ();
+			(Emulator.Instance.Keypad as WinFormsKeyboard).AttachTo (this);
 			var disp = (Emulator.Instance.Screen as WinFormsDisplay);
 			disp.AttachTo (this);
 			disp.Width = 640;
