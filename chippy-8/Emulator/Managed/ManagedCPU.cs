@@ -20,6 +20,7 @@ namespace chippy8
 		int loopcount;
 		bool endless_loop_msg;
 		bool invalid_mem_region_msg;
+		bool await_keypress;
 
 		public string Identifier { get; } = "CPU";
 
@@ -40,7 +41,7 @@ namespace chippy8
 		public void RunCycle () {
 
 			// Invalid memory region
-			if (PC + 0x200 >= 4096) {
+			if (PC + 0x200 >= 4096 || PC < 0x200) {
 				if (!invalid_mem_region_msg) {
 					Console.WriteLine ("Invalid memory region.");
 					invalid_mem_region_msg = true;
@@ -73,15 +74,16 @@ namespace chippy8
 			// 0x00E0
 			// 0x00EE
 			case 0x0:
-				// Clears the Emulator.Instance.Screen
 				switch (nn) {
 				case 0x00:
 					break;
 				case 0xE0:
+					// Clears the screen
 					Emulator.Instance.Screen.Clear ();
 					Emulator.Instance.Screen.Update ();
 					break;
 				case 0xEE:
+					// Returns from subroutine
 					PC = Emulator.Instance.Memory.Read16 (SB + SP);
 					SP -= 2;
 					break;
@@ -281,8 +283,14 @@ namespace chippy8
 					break;
 				case 0x0A:
 					// A key press is awaited, and then stored in V[X]
-					var key = Emulator.Instance.Keypad.Await ();
-					V [x] = (byte)key;
+					if (await_keypress && Emulator.Instance.Keypad.KeyAvailable ()) {
+						var key = Emulator.Instance.Keypad.Await ();
+						V [x] = (byte)key;
+						await_keypress = false;
+					} else {
+						await_keypress = true;
+						return;
+					}
 					break;
 				case 0x15:
 					// Sets the delay timer to V[X]
@@ -355,6 +363,7 @@ namespace chippy8
 		public void ClearFlags () {
 			endless_loop_msg = false;
 			invalid_mem_region_msg = false;
+			await_keypress = false;
 			loopcount = 0;
 			prevPC = 0;
 			Cycles = 0;

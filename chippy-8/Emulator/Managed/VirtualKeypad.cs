@@ -20,7 +20,10 @@ namespace chippy8
 		}
 
 		public ushort Await () {
-			while (buf < 0);
+			if (buf == -1) {
+				Console.WriteLine ("No key available!");
+				return 0;
+			}
 			var tmp = buf;
 			buf = -1;
 			return (ushort)tmp;
@@ -32,6 +35,10 @@ namespace chippy8
 
 		public bool CheckKey (ushort pos) {
 			return keys [pos] != 0;
+		}
+
+		public bool KeyAvailable () {
+			return buf >= 0;
 		}
 	}
 }
