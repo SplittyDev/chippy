@@ -11,7 +11,6 @@ namespace chippy8
 		static object syncLock = new object ();
 		static Debugger instance;
 
-		delegate void MMTimerProc (UInt32 timerid, UInt32 msg, IntPtr user, UInt32 dw1, UInt32 dw2);
 		bool running;
 		bool halted;
 		bool initialized;
@@ -41,25 +40,6 @@ namespace chippy8
 					Continue ();
 			}
 		}
-
-		[DllImport ("winmm.dll")]
-		static extern uint timeSetEvent (
-			UInt32 uDelay,
-			UInt32 uResolution,
-			[MarshalAs (UnmanagedType.FunctionPtr)]
-			MMTimerProc lpTimeProc,  
-			UInt32 dwUser,      
-			Int32 fuEvent      
-		);
-
-		[DllImport ("winmm.dll")]
-		static extern uint timeKillEvent (uint uTimerID);
-
-		[DllImport ("kernel32.dll")]
-		static extern bool QueryPerformanceCounter (out long PerformanceCount);
-
-		[DllImport ("kernel32.dll")]
-		static extern bool QueryPerformanceFrequency (out long Frequency);
 
 		Debugger () {
 			Frequency = 4000;

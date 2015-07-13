@@ -16,6 +16,11 @@ namespace chippy8
 		byte ST; // Sound timer
 		Random rng;
 
+		short prevPC;
+		int loopcount;
+		bool endless_loop_msg;
+		bool invalid_mem_region_msg;
+
 		public string Identifier { get; } = "CPU";
 
 		public void PreInit () {
@@ -29,15 +34,38 @@ namespace chippy8
 
 		public void Init () {
 			Array.Clear (V, 0, V.Length);
+			endless_loop_msg = false;
+			invalid_mem_region_msg = false;
+			loopcount = 0;
+			prevPC = 0;
 			Cycles = 0;
 			PC = 0x200;
 			SB = 0xEA0;
+			SP = 0;
+			DT = 0;
+			ST = 0;
+			I = 0;
 		}
 
 		public void RunCycle () {
 
-			if (PC > 4096 - 512)
+			// Invalid memory region
+			if (PC + 0x200 >= 4096) {
+				if (!invalid_mem_region_msg) {
+					Console.WriteLine ("Invalid memory region.");
+					invalid_mem_region_msg = true;
+				}
 				return;
+			}
+
+			// Endless loop
+			else if (loopcount > 100) {
+				if (!endless_loop_msg) {
+					Console.WriteLine ("Endless loop detected.");
+					endless_loop_msg = true;
+				}
+				return;
+			}
 
 			ushort instr = (ushort)Emulator.Instance.Memory.Read16 (PC);
 			short nnn = (short)(instr & 0x0FFF);
@@ -47,6 +75,7 @@ namespace chippy8
 			byte n = (byte)(instr & 0x000F);
 			byte nn = (byte)(instr & 0x00FF);
 
+			prevPC = PC;
 			PC += 2;
 
 			switch (op) {
@@ -312,6 +341,9 @@ namespace chippy8
 				Console.WriteLine ("Invalid opcode: 0x{0:X4}", op);
 				break;
 			}
+
+			if (prevPC == PC)
+				loopcount++;
 
 			if (DT > 0)
 				DT--;
