@@ -35,6 +35,10 @@ namespace chippy8
 		}
 
 		public void RunCycle () {
+
+			if (PC > 4096 - 512)
+				return;
+
 			ushort instr = (ushort)Emulator.Instance.Memory.Read16 (PC);
 			short nnn = (short)(instr & 0x0FFF);
 			byte op = (byte)((instr & 0xF000) >> 12);

@@ -74,6 +74,14 @@ namespace chippy8gui
 			menu_emulator.MenuItems.Add (new MenuItem ("Pause", (sender, e) => Debugger.Instance.Pause (), Shortcut.AltDownArrow));
 			menu_emulator.MenuItems.Add (new MenuItem ("Stop", (sender, e) => Debugger.Instance.Stop (), Shortcut.AltLeftArrow));
 			menu_emulator.MenuItems.Add ("Restart", (sender, e) => Debugger.Instance.Restart ());
+			var menu_emulator_speed = new MenuItem ("Speed");
+			menu_emulator_speed.MenuItems.Add ("25%", (sender, e) => Debugger.Instance.Frequency = 1000);
+			menu_emulator_speed.MenuItems.Add ("50%", (sender, e) => Debugger.Instance.Frequency = 2000);
+			menu_emulator_speed.MenuItems.Add ("100%", (sender, e) => Debugger.Instance.Frequency = 4000);
+			menu_emulator_speed.MenuItems.Add ("200%", (sender, e) => Debugger.Instance.Frequency = 8000);
+			menu_emulator_speed.MenuItems.Add ("500%", (sender, e) => Debugger.Instance.Frequency = 20000);
+			menu_emulator_speed.MenuItems.Add ("Unlimited", (sender, e) => Debugger.Instance.Frequency = 0);
+			menu_emulator.MenuItems.Add (menu_emulator_speed);
 
 			// Debug menu
 			var menu_debug = new MenuItem ("Debugger");

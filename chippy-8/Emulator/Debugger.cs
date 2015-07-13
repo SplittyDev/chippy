@@ -15,7 +15,8 @@ namespace chippy8
 		bool running;
 		bool halted;
 		bool initialized;
-		double frequency = 0;
+		double frequency;
+		int count;
 
 		public static Debugger Instance {
 			get {
@@ -35,7 +36,7 @@ namespace chippy8
 					continue_after = true;
 					Pause ();
 				}
-				double frequency = 1000d / value;
+				frequency = value;
 				if (continue_after)
 					Continue ();
 			}
@@ -61,7 +62,7 @@ namespace chippy8
 		static extern bool QueryPerformanceFrequency (out long Frequency);
 
 		Debugger () {
-			Frequency = 60; // 60hz
+			Frequency = 4000;
 		}
 
 		void Initialize () {
@@ -133,19 +134,19 @@ namespace chippy8
 				bool stopped = false;
 				Emulator.Instance.InitRun ();
 
-				//
-				// Precision timing is really needed here
-				//
-
+				Stopwatch sw = Stopwatch.StartNew ();
 				while (running) {
-					if (stopped && running) {
-						stopped = false;
-						Emulator.Instance.InitRun ();
+					if (frequency == 0 || (double)((double)sw.ElapsedTicks / (double)TimeSpan.TicksPerMillisecond) > (1000d / frequency)) {
+						if (stopped && running) {
+							stopped = false;
+							Emulator.Instance.InitRun ();
+						}
+						if (running) {
+							Emulator.Instance.BlindRunCycle ();
+						} else
+							stopped = true;
+						sw.Restart ();
 					}
-					if (running) {
-						Emulator.Instance.BlindRunCycle ();
-					} else
-						stopped = true;
 				}
 
 				halted = true;

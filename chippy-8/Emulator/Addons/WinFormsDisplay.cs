@@ -80,11 +80,11 @@ namespace chippy8
 				updating = true;
 				for (var y = 0; y < 32; y++)
 					for (var x = 0; x < 64; x++)
-						bmp.SetPixel (x, y, Color.Black);
+						bmp.SetPixel (x, y, Color.FromArgb (67, 107, 67));
 				for (var y = 0; y < 32; y++)
 					for (var x = 0; x < 64; x++)
 						if (screen.CheckPixel ((ushort)(x + y * 64)))
-							bmp.SetPixel (x, y, Color.White);
+							bmp.SetPixel (x, y, Color.FromArgb (200, 200, 200));
 				screen.draw = false;
 				updating = false;
 			}
