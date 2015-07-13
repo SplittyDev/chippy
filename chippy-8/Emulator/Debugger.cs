@@ -129,10 +129,14 @@ namespace chippy8
 		void InternalRun () {
 			halted = false;
 			running = true;
-			Stopwatch watch = new Stopwatch ();
 			Task.Factory.StartNew (() => {
 				bool stopped = false;
 				Emulator.Instance.InitRun ();
+
+				//
+				// Precision timing is really needed here
+				//
+
 				while (running) {
 					if (stopped && running) {
 						stopped = false;
@@ -142,8 +146,8 @@ namespace chippy8
 						Emulator.Instance.BlindRunCycle ();
 					} else
 						stopped = true;
-					//Thread.Sleep (1);
 				}
+
 				halted = true;
 			});
 		}
