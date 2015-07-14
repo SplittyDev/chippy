@@ -15,7 +15,6 @@ namespace chippy
 		bool halted;
 		bool initialized;
 		double frequency;
-		int count;
 
 		public static Debugger Instance {
 			get {
