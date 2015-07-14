@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
+using System.ComponentModel;
 
 namespace chippy.bindings.winforms
 {
+	[DesignerCategory ("Chippy")]
 	public class Chip8View : UserControl
 	{
 		Keyboard keypad;
@@ -13,6 +15,11 @@ namespace chippy.bindings.winforms
 		public Color FOREGROUND_GRAY = Color.FromArgb (200, 200, 200);
 
 		public Chip8View () {
+			SetStyle (ControlStyles.AllPaintingInWmPaint, true);
+			SetStyle (ControlStyles.OptimizedDoubleBuffer, true);
+			SetStyle (ControlStyles.ResizeRedraw, true);
+			SetStyle (ControlStyles.SupportsTransparentBackColor, true);
+			SetStyle (ControlStyles.UserPaint, true);
 			keypad = new Keyboard ();
 			screen = new ScreenControl {
 				BackColor = BACKGROUND_GREEN,
