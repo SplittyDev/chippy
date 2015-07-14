@@ -6,14 +6,16 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using chippy8;
+using chippy;
+using chippy.bindings.winforms;
 
-namespace chippy8gui
+namespace chippy
 {
 	public class MainForm : Form
 	{
 		FileStream log;
 		StreamWriter logWriter;
+		Chip8View emulator;
 
 		public MainForm () {
 			InitializeComponents ();
@@ -41,17 +43,10 @@ namespace chippy8gui
 		}
 
 		void InitializeEmulator () {
-			Emulator.Instance
-				.Connect<ManagedMemory> ()
-				.Connect<ManagedCPU> ()
-				.Connect<WinFormsDisplay> ()
-				.Connect<WinFormsKeyboard> ();
-			(Emulator.Instance.Keypad as WinFormsKeyboard).AttachTo (this);
-			var disp = (Emulator.Instance.Screen as WinFormsDisplay);
-			disp.AttachTo (this);
-			disp.Width = 640;
-			disp.Height = 320;
-			disp.Location = new Point (0, 0);
+			emulator = new Chip8View ();
+			emulator.Width = 640;
+			emulator.Height = 320;
+			this.Controls.Add (emulator);
 		}
 
 		void InitializeComponents () {

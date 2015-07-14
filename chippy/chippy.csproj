@@ -8,14 +8,14 @@
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProjectGuid>{75B0E732-8E52-417A-9327-2363B5DD22D0}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>chippy8</RootNamespace>
+    <RootNamespace>chippy</RootNamespace>
     <AssemblyName>chippy</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\bin\chippy-8\</OutputPath>
+    <OutputPath>..\bin\</OutputPath>
     <DefineConstants>DEBUG;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -26,7 +26,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DebugType>full</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\bin\chippy-8\</OutputPath>
+    <OutputPath>..\bin\</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Externalconsole>true</Externalconsole>
@@ -35,44 +35,26 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="codeaddicts.libArgument">
-      <HintPath>..\packages\Codeaddicts.libArgument.0.1.5604.7101\lib\net40\codeaddicts.libArgument.dll</HintPath>
-    </Reference>
-    <Reference Include="hqxSharp">
-      <HintPath>..\..\..\hqxSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="FastGraphicsLib">
-      <HintPath>..\..\..\..\Downloads\FastGraphicsLib\FastGraphicsLib.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Options.cs" />
     <Compile Include="Emulator\Emulator.cs" />
     <Compile Include="Emulator\Interfaces\IMemory.cs" />
-    <Compile Include="Emulator\Managed\ManagedCPU.cs" />
     <Compile Include="Emulator\EmulatorExtensions.cs" />
     <Compile Include="Emulator\Interfaces\IComponent.cs" />
     <Compile Include="Emulator\Interfaces\ICpu.cs" />
-    <Compile Include="Emulator\Managed\ManagedMemory.cs" />
-    <Compile Include="Emulator\Addons\WinFormsDisplay.cs" />
     <Compile Include="Emulator\Debugger.cs" />
     <Compile Include="Emulator\CpuSnapshot.cs" />
-    <Compile Include="Emulator\Managed\VirtualScreen.cs" />
-    <Compile Include="Emulator\Managed\VirtualKeypad.cs" />
     <Compile Include="Emulator\Interfaces\IDisplayDevice.cs" />
     <Compile Include="Emulator\Interfaces\IInputDevice.cs" />
-    <Compile Include="Emulator\Addons\WinFormsKeyboard.cs" />
+    <Compile Include="Emulator\VirtualKeypad.cs" />
+    <Compile Include="Emulator\VirtualScreen.cs" />
+    <Compile Include="Emulator\ManagedMemory.cs" />
+    <Compile Include="Emulator\ManagedCPU.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Folder Include="Emulator\" />
     <Folder Include="Emulator\Interfaces\" />
-    <Folder Include="Emulator\Managed\" />
-    <Folder Include="Emulator\Unmanaged\" />
-    <Folder Include="Emulator\Addons\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

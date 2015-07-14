@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace chippy8gui {
+namespace chippy {
     using System;
     
     

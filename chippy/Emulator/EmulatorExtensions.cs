@@ -1,13 +1,17 @@
 ﻿using System;
 using System.IO;
 
-namespace chippy8
+namespace chippy
 {
 	public static class EmulatorExtensions
 	{
 		public static Emulator Connect<TComponent> (this Emulator emulator)
 			where TComponent : IComponent, new() {
 			var com = new TComponent ();
+			return emulator.Connect (com);
+		}
+
+		public static Emulator Connect (this Emulator emulator, IComponent com) {
 			com.PreInit ();
 			if (com is IMemory)
 				emulator.Memory = com as IMemory;

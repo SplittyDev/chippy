@@ -2,18 +2,18 @@
 using System.Windows.Forms;
 using System.Drawing;
 using System.Drawing.Imaging;
-using hqx;
+using chippy;
 
-namespace chippy8
+namespace chippy.bindings.winforms
 {
-	public class WinFormsDisplay : Control, IDisplayDevice
+	public class ScreenControl : Control, IDisplayDevice
 	{
 		Bitmap bmp;
 		VirtualScreen screen;
-		Form frm;
+		Control ctrl;
 		bool updating;
 
-		public WinFormsDisplay () {
+		public ScreenControl () {
 			Width = 64;
 			Height = 32;
 			SetStyle (ControlStyles.AllPaintingInWmPaint, true);
@@ -21,19 +21,18 @@ namespace chippy8
 			SetStyle (ControlStyles.ResizeRedraw, true);
 			SetStyle (ControlStyles.SupportsTransparentBackColor, true);
 			SetStyle (ControlStyles.UserPaint, true);
-			BackColor = Color.Transparent;
 		}
 
-		public void AttachTo (Form frm) {
+		public void AttachTo (Control frm) {
 			frm.Invoke (new MethodInvoker (() => {
-				this.frm = frm;
-				this.frm.Controls.Add (this);
+				this.ctrl = frm;
+				this.ctrl.Controls.Add (this);
 			}));
 		}
 
 		public void Detach () {
-			this.frm.Invoke (new MethodInvoker (() => {
-				this.frm.Controls.Remove (this);
+			this.ctrl.Invoke (new MethodInvoker (() => {
+				this.ctrl.Controls.Remove (this);
 			}));
 		}
 
@@ -73,19 +72,23 @@ namespace chippy8
 			this.Invalidate ();
 		}
 
+		public bool ShouldRedraw () {
+			return screen.ShouldRedraw ();
+		}
+
 		void InternalDraw () {
 			if (updating)
 				return;
-			if (screen.draw) {
+			if (screen.ShouldRedraw ()) {
 				updating = true;
 				for (var y = 0; y < 32; y++)
 					for (var x = 0; x < 64; x++)
-						bmp.SetPixel (x, y, Color.FromArgb (67, 107, 67));
+						bmp.SetPixel (x, y, this.BackColor);
 				for (var y = 0; y < 32; y++)
 					for (var x = 0; x < 64; x++)
 						if (screen.CheckPixel ((ushort)(x + y * 64)))
-							bmp.SetPixel (x, y, Color.FromArgb (200, 200, 200));
-				screen.draw = false;
+							bmp.SetPixel (x, y, this.ForeColor);
+				screen.Draw ();
 				updating = false;
 			}
 		}

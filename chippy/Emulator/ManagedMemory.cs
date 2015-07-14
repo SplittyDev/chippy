@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace chippy8
+namespace chippy
 {
 	public class ManagedMemory : IComponent, IMemory
 	{

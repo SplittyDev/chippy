@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 
-namespace chippy8
+namespace chippy
 {
 	public class ManagedCPU : ICpu
 	{

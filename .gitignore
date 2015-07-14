@@ -1,6 +1,9 @@
 #Autosave files
 *~
 
+#Chippy log files
+*.log
+
 #build
 [Oo]bj/
 [Bb]in/

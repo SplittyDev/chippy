@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace chippy8
+namespace chippy
 {
 	public interface IMemory : IComponent
 	{

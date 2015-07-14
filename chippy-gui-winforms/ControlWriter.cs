@@ -4,7 +4,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Threading.Tasks;
 
-namespace chippy8gui
+namespace chippy
 {
 	public class ControlWriter : TextWriter
 	{

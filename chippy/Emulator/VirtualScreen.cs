@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace chippy8
+namespace chippy
 {
 	public class VirtualScreen : IDisplayDevice
 	{
@@ -49,6 +49,10 @@ namespace chippy8
 		public virtual void Draw () {
 			// Reset draw flag
 			draw = false;
+		}
+
+		public bool ShouldRedraw () {
+			return draw;
 		}
 	}
 }

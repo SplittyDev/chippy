@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 
-namespace chippy8
+namespace chippy
 {
 	public class Debugger
 	{

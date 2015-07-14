@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace chippy8
+namespace chippy
 {
 	public interface IDisplayDevice : IComponent
 	{
@@ -10,6 +10,7 @@ namespace chippy8
 		void SetPixel (int pos);
 		void Update ();
 		void Draw ();
+		bool ShouldRedraw ();
 	}
 }
 

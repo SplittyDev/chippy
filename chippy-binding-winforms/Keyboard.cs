@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Windows.Forms;
 using System.Collections.Generic;
+using chippy;
 
-namespace chippy8
+namespace chippy.bindings.winforms
 {
-	public class WinFormsKeyboard : VirtualKeypad
+	public class Keyboard : VirtualKeypad
 	{
 		Form frm;
 
@@ -15,7 +16,7 @@ namespace chippy8
 			'4', 'r', 'f', 'v'
 		};
 
-		public WinFormsKeyboard () {
+		public Keyboard () {
 		}
 
 		public void AttachTo (Form frm) {

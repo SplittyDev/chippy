@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace chippy8
+namespace chippy
 {
 	public class Emulator
 	{
