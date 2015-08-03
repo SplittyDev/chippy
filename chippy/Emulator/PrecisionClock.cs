@@ -10,7 +10,7 @@ namespace chippy
 	/// </summary>
 	public class PrecisionClock
 	{
-		int frequency;
+		int frequency, cycles;
 		long timer, lastTime;
 		double delta, ticksPerCycle;
 		bool running;
@@ -18,7 +18,7 @@ namespace chippy
 		CancellationTokenSource tksrc;
 		CancellationToken tk;
 
-		public delegate void TickEventHandler ();
+		public delegate void TickEventHandler (int cycles);
 		public event TickEventHandler OnTick;
 		public event TickEventHandler OnSecondPassed;
 
@@ -72,12 +72,14 @@ namespace chippy
 
 					while (delta >= 1) {
 						delta--;
-						OnTick ();
+						cycles++;
+						OnTick (cycles);
 					}
 
 					if (Stopwatch.GetTimestamp () - timer > Stopwatch.Frequency) {
 						timer += Stopwatch.Frequency;
-						OnSecondPassed ();
+						OnSecondPassed (cycles);
+						cycles = 0;
 					}
 				}
 			}, tksrc.Token);
