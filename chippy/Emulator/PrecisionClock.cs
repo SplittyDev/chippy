@@ -96,6 +96,7 @@ namespace chippy
 			} catch (AggregateException) {
 			} finally {
 				tksrc.Dispose ();
+				running = false;
 			}
 		}
 	}
