@@ -77,7 +77,7 @@ namespace chippy
 					if (Stopwatch.GetTimestamp () - timer > Stopwatch.Frequency)
 						timer += Stopwatch.Frequency;
 				}
-			}, tk);
+			}, tksrc.Token);
 
 			return worker;
 		}
