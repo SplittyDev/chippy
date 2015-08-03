@@ -19,7 +19,8 @@ namespace chippy
 		CancellationToken tk;
 
 		public delegate void TickEventHandler ();
-		public event TickEventHandler Tick;
+		public event TickEventHandler OnTick;
+		public event TickEventHandler OnSecondPassed;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="chippy.PrecisionClock"/> class.
@@ -71,11 +72,13 @@ namespace chippy
 
 					while (delta >= 1) {
 						delta--;
-						Tick ();
+						OnTick ();
 					}
 
-					if (Stopwatch.GetTimestamp () - timer > Stopwatch.Frequency)
+					if (Stopwatch.GetTimestamp () - timer > Stopwatch.Frequency) {
 						timer += Stopwatch.Frequency;
+						OnSecondPassed ();
+					}
 				}
 			}, tksrc.Token);
 
