@@ -50,6 +50,7 @@
     <Compile Include="Emulator\VirtualScreen.cs" />
     <Compile Include="Emulator\ManagedMemory.cs" />
     <Compile Include="Emulator\ManagedCPU.cs" />
+    <Compile Include="Emulator\PrecisionClock.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
